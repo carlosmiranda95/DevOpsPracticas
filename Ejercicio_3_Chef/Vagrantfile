@@ -1,0 +1,37 @@
+$script = <<-'SCRIPT'
+#Aqui se hace el saludo del dia
+sudo echo "Bienvenidos a mi servidor" >> /etc/motd
+
+#Aqui se define el archivo de configuracion de la aplicacion
+sudo echo "miaplicacion.db.ip=192.168.10.12
+miaplicacion.db.usuario=juancho
+miaplicacion.db.puerto=5432" >> /etc/miaplicacion.conf
+
+#aqui se crea el usuario
+sudo useradd -u 12345 -g users -d /home/uagrm -s /bin/bash -p '$1$0W/Lmial$KaCSG.yyoX2dtHwINgiBc/' uagrm
+
+#aqui se instala el servicio NTP
+sudo yum install -y ntp
+
+#aqui se modifica el archivo del servicio ntp
+sudo echo "server 0.south-america.pool.ntp.org
+server 1.south-america.pool.ntp.org
+server 2.south-america.pool.ntp.org
+server 3.south-america.pool.ntp.org
+logfile /var/log/ntp.log" >> /etc/ntp.conf
+
+#aqui se inicia el servicio ntp
+sudo systemctl start ntpd
+
+#se instala editor nano
+sudo yum -y install nano
+SCRIPT
+Vagrant.configure("2") do |config|
+    config.vm.box = "centos/7"
+    config.vm.network "forwarded_port", guest: 9000, host:9000
+    config.vm.provider "virtualbox" do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+    config.vm.provision "shell", inline: $script
+end

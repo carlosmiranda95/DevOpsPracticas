@@ -1,0 +1,30 @@
+$script = <<-'SCRIPT'
+#Aqui se hace el saludo del dia
+sudo echo "Bienvenidos a mi servidor Docker" >> /etc/motd
+
+#se instala editor nano
+sudo yum -y install nano
+
+#aqui se instala wget
+sudo yum -y install wget
+
+#instalacion de docker
+sudo yum install -y docker
+
+sudo systemctl enable docker.service
+
+sudo systemctl start docker
+
+cd /home/vagrant/appnode && sudo docker build -t appnode . && sudo docker run -d --name appnodejs -p 3000:3000 appnode
+
+SCRIPT
+Vagrant.configure("2") do |config|
+    config.vm.box = "centos/7"
+    config.vm.network "public_network"
+    config.vm.provider "virtualbox" do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+    config.vm.provision "file", source: "D:/DevOps/Ejercicio2/appnode", destination: "/home/vagrant/"
+    config.vm.provision "shell", inline: $script
+end
